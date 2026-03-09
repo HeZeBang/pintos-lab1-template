@@ -1,0 +1,84 @@
+{
+  "name": "PintOS Lab1: Threads",
+  "description": "操作系统课程实验一：线程管理。实现定时器睡眠、优先级调度与捐赠、以及4.4BSD多级反馈队列调度器。",
+  "version": "1.0.0",
+  "category": "os",
+  "difficulty": "intermediate",
+  "estimated_time": "2 weeks",
+  "tags": ["pintos", "threads", "scheduling", "os", "synchronization"],
+
+  "docker": {
+    "base_image": "syrriinge/pintos-sp24:latest",
+    "build_args": {},
+    "run_args": ["--cap-add=SYS_PTRACE", "--security-opt=seccomp=unconfined"],
+    "network": "wolverine_wolverine-network",
+    "workdir": "/home/ubuntu",
+    "ports": [],
+    "volumes": [],
+    "environment": {}
+  },
+
+  "connection": {
+    "protocol": "ssh",
+    "username": "ubuntu",
+    "password": "ubuntu",
+    "port": 22
+  },
+
+  "scoring": {
+    "total_points": 100,
+    "checkpoints": [
+      {
+        "order": 1,
+        "name": "编译 PintOS threads 模块",
+        "type": "command_pattern",
+        "points": 10,
+        "config": {
+          "patterns": ["make", "cd.*threads", "cd pintos"],
+          "match_any": true
+        }
+      },
+      {
+        "order": 2,
+        "name": "Task 1: Alarm Clock - 运行 alarm 测试",
+        "type": "command_pattern",
+        "points": 25,
+        "config": {
+          "patterns": ["alarm-wait", "alarm-simultaneous", "alarm-priority", "alarm-zero", "alarm-negative"],
+          "match_any": true
+        }
+      },
+      {
+        "order": 3,
+        "name": "Task 2: Priority Scheduling - 运行优先级测试",
+        "type": "command_pattern",
+        "points": 35,
+        "config": {
+          "patterns": ["priority-change", "priority-donate", "priority-fifo", "priority-preempt", "priority-sema", "priority-condvar"],
+          "match_any": true
+        }
+      },
+      {
+        "order": 4,
+        "name": "Task 3: Advanced Scheduler - 运行 MLFQS 测试",
+        "type": "command_pattern",
+        "points": 30,
+        "config": {
+          "patterns": ["mlfqs", "-mlfqs", "mlfqs-load-1", "mlfqs-fair"],
+          "match_any": true
+        }
+      }
+    ]
+  },
+
+  "metadata": {
+    "author": "OS Course Team",
+    "created_at": "2026-03-10",
+    "updated_at": "2026-03-10",
+    "license": "MIT",
+    "references": [
+      "https://web.stanford.edu/class/cs140/projects/pintos/pintos_1.html",
+      "https://github.com/syrriinge/pintos-sp24"
+    ]
+  }
+}
