@@ -4,12 +4,13 @@
 
 本实验基于 **PintOS** 教学操作系统，在已有的最小化线程系统基础上，完成三项核心任务：
 
-| 任务 | 内容 | 分值 |
+| 任务 | 内容 | 测试分值占比 |
 |------|------|------|
-| Task 1 | Alarm Clock（定时器睡眠） | 25% |
-| Task 2 | Priority Scheduling（优先级调度与捐赠） | 35% |
-| Task 3 | Advanced Scheduler（4.4BSD 多级反馈队列） | 30% |
-| 设计文档 | DESIGNDOC | 10% |
+| Task 1 | Alarm Clock（定时器睡眠） | 20% |
+| Task 2 | Priority Scheduling（优先级调度与捐赠） | 40% |
+| Task 3 | Advanced Scheduler（4.4BSD 多级反馈队列） | 40% |
+
+此外需完成**设计文档**（`doc/threads.tmpl`）。
 
 **参考资料**: [Stanford CS140 PintOS Lab1](https://web.stanford.edu/class/cs140/projects/pintos/pintos_1.html)
 
@@ -23,8 +24,31 @@
 /root/pintos/src/
 ├── threads/       ← 本次实验主要修改目录
 ├── devices/       ← timer.c 需要修改
+├── lib/           ← 辅助函数
 ├── utils/         ← pintos 启动脚本
+├── tests/threads/ ← 测试用例
 └── ...
+```
+
+### PintOS 项目一文件概览
+
+```
+src/threads/
+├── init.c          ← 第 3 步执行 (main)
+├── interrupt.c
+├── intr-stubs.S
+├── io.h
+├── kernel.lds.S
+├── loader.S        ← 第 1 步执行
+├── malloc.c
+├── palloc.c
+├── pte.h
+├── start.S         ← 第 2 步执行
+├── switch.S
+├── synch.c
+├── thread.c
+├── thread.h
+└── vaddr.h
 ```
 
 ### 快速验证环境
@@ -32,11 +56,10 @@
 ```bash
 cd /root/pintos/src/threads
 make
-cd build
-pintos -- run alarm-wait
+pintos -v -k -T 60 --bochs -- -q run alarm-single
 ```
 
-若能看到测试输出，环境正常。
+若能看到测试输出，环境正常。也可以使用 `--qemu` 代替 `--bochs`。
 
 ---
 
@@ -79,11 +102,12 @@ cd /root/pintos/src/threads && make
 cd build
 
 # 运行所有 alarm 测试
-pintos -- run alarm-wait
-pintos -- run alarm-simultaneous
-pintos -- run alarm-priority
-pintos -- run alarm-zero
-pintos -- run alarm-negative
+pintos -v -k -T 60 --bochs -- -q run alarm-single
+pintos -v -k -T 60 --bochs -- -q run alarm-multiple
+pintos -v -k -T 60 --bochs -- -q run alarm-simultaneous
+pintos -v -k -T 60 --bochs -- -q run alarm-priority
+pintos -v -k -T 60 --bochs -- -q run alarm-zero
+pintos -v -k -T 60 --bochs -- -q run alarm-negative
 ```
 
 **预期结果**：每个测试输出 `PASS`。
@@ -131,22 +155,22 @@ cd /root/pintos/src/threads && make
 cd build
 
 # 基础优先级测试
-pintos -- run priority-preempt
-pintos -- run priority-change
-pintos -- run priority-fifo
+pintos -v -k -T 60 --bochs -- -q run priority-change
+pintos -v -k -T 60 --bochs -- -q run priority-preempt
+pintos -v -k -T 60 --bochs -- -q run priority-fifo
 
 # 优先级捐赠测试
-pintos -- run priority-donate-one
-pintos -- run priority-donate-multiple
-pintos -- run priority-donate-multiple2
-pintos -- run priority-donate-nest
-pintos -- run priority-donate-sema
-pintos -- run priority-donate-lower
-pintos -- run priority-donate-chain
+pintos -v -k -T 60 --bochs -- -q run priority-donate-one
+pintos -v -k -T 60 --bochs -- -q run priority-donate-multiple
+pintos -v -k -T 60 --bochs -- -q run priority-donate-multiple2
+pintos -v -k -T 60 --bochs -- -q run priority-donate-nest
+pintos -v -k -T 60 --bochs -- -q run priority-donate-chain
+pintos -v -k -T 60 --bochs -- -q run priority-donate-sema
+pintos -v -k -T 60 --bochs -- -q run priority-donate-lower
 
 # 同步原语优先级测试
-pintos -- run priority-sema
-pintos -- run priority-condvar
+pintos -v -k -T 60 --bochs -- -q run priority-sema
+pintos -v -k -T 60 --bochs -- -q run priority-condvar
 ```
 
 ### 常见问题
@@ -211,52 +235,82 @@ pintos -- run priority-condvar
 cd /root/pintos/src/threads && make
 cd build
 
-pintos -v -- -mlfqs run mlfqs-load-1
-pintos -v -- -mlfqs run mlfqs-load-60
-pintos -v -- -mlfqs run mlfqs-load-avg
-pintos -v -- -mlfqs run mlfqs-recent-1
-pintos -v -- -mlfqs run mlfqs-fair-2
-pintos -v -- -mlfqs run mlfqs-fair-20
-pintos -v -- -mlfqs run mlfqs-nice-2
-pintos -v -- -mlfqs run mlfqs-nice-10
-pintos -v -- -mlfqs run mlfqs-block
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-load-1
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-load-60
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-load-avg
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-recent-1
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-fair-2
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-fair-20
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-nice-2
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-nice-10
+pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-block
 ```
+
+> 注意：mlfqs 测试需要较长时间运行，因此超时参数设为 `-T 480`。
 
 ---
 
 ## 设计文档
 
-完成实验后，需要填写设计文档：
-
-```bash
-cp /root/pintos/src/threads/DESIGNDOC /home/ubuntu/threads-DESIGNDOC.txt
-```
+完成实验后，需要填写设计文档模板 `doc/threads.tmpl`。
 
 文档中需要回答每个任务的设计问题，包括：
+
 - 数据结构设计
 - 算法思路
 - 同步策略
 - 设计决策的理由
+
+将填写好的文档（纯文本、Markdown 或 PDF 格式）提交到仓库中。
 
 ---
 
 ## 一键运行所有测试
 
 ```bash
-cd /root/pintos/src/threads && make
-cd build
-
-# 运行所有测试并统计结果
-make check 2>&1 | tail -20
+cd /root/pintos/src/threads
+make
+make check
+make grade
 ```
+
+---
+
+## 调试技巧
+
+### 使用 GDB
+
+`make check` 会输出每个测试对应的 `pintos` 命令。在命令中加入 `--gdb` 即可使用 GDB 调试。
+
+例如：
+
+```bash
+# 终端 1：启动 pintos 并等待 GDB 连接
+cd /root/pintos/src/threads/build
+pintos --gdb -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-load-60
+
+# 终端 2：启动 GDB 并连接
+cd /root/pintos/src/threads/build
+pintos-gdb kernel.o
+(gdb) target remote localhost:1234
+(gdb) b main
+(gdb) c
+```
+
+### 使用 printf
+
+> ⚠️ `printf` 底层会调用 `lock_acquire` → `sema_down`。如果你的信号量/调度实现有 bug，`printf` 可能导致 kernel panic。此时请改用 GDB 调试。
+
+### 使用 ASSERT
+
+善用 `ASSERT()` 宏检查不变量，尽早发现错误。
 
 ---
 
 ## 提交要求
 
 1. 修改后的源代码（`threads/` 和 `devices/` 目录）
-2. 填写完整的 `DESIGNDOC`
-3. 所有测试通过截图
+2. 填写完整的设计文档（基于 `doc/threads.tmpl`）
 
 ---
 
