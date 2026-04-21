@@ -18,10 +18,10 @@
 
 ## 环境说明
 
-登录后，PintOS 源码位于 `/root/pintos/src/`，已配置好编译工具链（i386-elf-gcc、bochs 模拟器等）。
+登录后，PintOS 源码位于 `/home/student/pintos/src/`，已配置好编译工具链（i386-elf-gcc、bochs 模拟器等）。
 
 ```
-/root/pintos/src/
+/home/student/pintos/src/
 ├── threads/       ← 本次实验主要修改目录
 ├── devices/       ← timer.c 需要修改
 ├── lib/           ← 辅助函数
@@ -54,7 +54,7 @@ src/threads/
 ### 快速验证环境
 
 ```bash
-cd /root/pintos/src/threads
+cd /home/student/pintos/src/threads
 make
 pintos -v -k -T 60 --bochs -- -q run alarm-single
 ```
@@ -98,7 +98,7 @@ void timer_sleep(int64_t ticks) {
 ### 测试方法
 
 ```bash
-cd /root/pintos/src/threads && make
+cd /home/student/pintos/src/threads && make
 cd build
 
 # 运行所有 alarm 测试
@@ -151,7 +151,7 @@ int  thread_get_priority(void);              // 返回当前有效优先级（�
 ### 测试方法
 
 ```bash
-cd /root/pintos/src/threads && make
+cd /home/student/pintos/src/threads && make
 cd build
 
 # 基础优先级测试
@@ -232,7 +232,7 @@ pintos -v -k -T 60 --bochs -- -q run priority-condvar
 ### 测试方法
 
 ```bash
-cd /root/pintos/src/threads && make
+cd /home/student/pintos/src/threads && make
 cd build
 
 pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-load-1
@@ -268,7 +268,7 @@ pintos -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-block
 ## 一键运行所有测试
 
 ```bash
-cd /root/pintos/src/threads
+cd /home/student/pintos/src/threads
 make
 make check
 make grade
@@ -286,11 +286,11 @@ make grade
 
 ```bash
 # 终端 1：启动 pintos 并等待 GDB 连接
-cd /root/pintos/src/threads/build
+cd /home/student/pintos/src/threads/build
 pintos --gdb -v -k -T 480 --bochs -- -q -mlfqs run mlfqs-load-60
 
 # 终端 2：启动 GDB 并连接
-cd /root/pintos/src/threads/build
+cd /home/student/pintos/src/threads/build
 pintos-gdb kernel.o
 (gdb) target remote localhost:1234
 (gdb) b main
